@@ -3,7 +3,7 @@
 param ([string] $env = "local", [string] $action = "publish")
 
 $msg = 'gh-pages.ps1: src/wwwroot -> gh-pages'
-$gitURL = "@repo@"
+$gitURL = "https://github.com/websharper-samples/ChartJS"
 
 write-host -foregroundColor "green" "=====> $msg"
 
