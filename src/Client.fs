@@ -1,157 +1,88 @@
 namespace Samples
 
 open WebSharper
-open WebSharper.ChartJs
 open WebSharper.JavaScript
+open WebSharper.ChartJs
 open WebSharper.UI
 open WebSharper.UI.Html
+open WebSharper.UI.Templating
 open WebSharper.UI.Client
 
+/// A small dashboard of Chart.js charts, built with WebSharper.ChartJs.
 [<JavaScript>]
-module ChartJs =
-    type Expense =
-        {
-            Date: string
-            Amount: float
-        }
+module Client =
 
-    type Employee =
-        {
-            Name: string
-            Age: int
-        }
+    type Template = Templating.Template<"wwwroot/index.html", ClientLoad.FromDocument>
 
-    let GetAllExpenses () =
-        let fate = System.Random()
-        seq {
-            for index in [1 .. 7] do
-            yield { Date   = "Jan " + string index + ", 2015"
-                    Amount = fate.NextDouble() * 100.0 }
-        }
-        |> Seq.toArray
-        |> async.Return
+    /// Charts fill their container rather than a fixed canvas size.
+    let private options () =
+        let o = Options()
+        o.Responsive <- true
+        o.MaintainAspectRatio <- false
+        o
 
-    let GetAllEmployees () =
-        [|
-            { Name = "Sandor"; Age = 20 }
-            { Name = "Loic";   Age = 25 }
-            { Name = "Istvan"; Age = 21 }
-            { Name = "Andras"; Age = 29 }
-        |]
-        |> async.Return
+    let private render (data: ChartData) =
+        canvas [
+            attr.``class`` "chart-canvas"
+            on.afterRender (fun element ->
+                Chart(element, ChartCreate(data, options())) |> ignore)
+        ] []
 
-    [<Inline "$0.getContext(\"2d\")">]
-    let getContext (canvas : Dom.Node) = X<CanvasRenderingContext2D>
+    let private lineChart () =
+        let random = System.Random()
+        let labels = [| for i in 1 .. 7 -> sprintf "Jan %d, 2015" i |]
+        let values = [| for _ in labels -> random.NextDouble() * 100.0 |]
+        let data = ChartData()
+        data.Datasets <-
+            [|
+                LineChartDataSet(
+                    Label = "Amount",
+                    BackgroundColor = "#dbeafe",
+                    BorderColor = "#3b82f6",
+                    Data = values) :> ADataSet
+            |]
+        data.Labels <- labels
+        render data
 
-    let LineChart =
-        div [] [
-            h3 [] [text "My expenses as a line chart (in US dollars)"]
-            canvas [
-                attr.width  "450"
-                attr.height "300"
-                on.afterRender (fun canvas ->
-                    async {
-                        let context = getContext canvas
-                        let! expenses = GetAllExpenses ()
-                        let (labels, data) =
-                            expenses
-                            |> Array.map (fun expense -> expense.Date, float (expense.Amount.JS.ToFixed 2))
-                            |> Array.unzip
-                        let cd =
-                            ChartData(
-                                [|
-                                    LineChartDataSet(
-                                        BackgroundColor  = "#d6e8f6",
-                                        PointBackgroundColor = Union1Of2 "#b0c4de",
-                                        Data       = data
-                                    )
-                                |]
-                            )
-                        cd.Labels <- labels
-                        let ccc = CommonChartConfig()
-                        let cc = ChartCreate("line", cd, ccc)
-                        Chart(context.Canvas, cc)
-                        |> ignore
-                    }
-                    |> Async.Start
-                )
-            ] []
-        ]
+    let private barChart () =
+        let labels = [| "Sandor"; "Loic"; "Istvan"; "Andras" |]
+        let values = [| 20.0; 25.0; 21.0; 29.0 |]
+        let data = ChartData()
+        data.Datasets <-
+            [|
+                BarChartDataSet(
+                    Label = "Age",
+                    BackgroundColor = "#c7d2fe",
+                    BorderColor = "#6366f1",
+                    Data = values) :> ADataSet
+            |]
+        data.Labels <- labels
+        render data
 
-    let BarChart =
-        div [] [
-            h3 [] [text "Employees and their ages"]
-            canvas [
-                attr.width  "450"
-                attr.height "300"
-                on.afterRender (fun canvas ->
-                    async {
-                        let context = getContext canvas
-                        let! employees = GetAllEmployees ()
-                        let (labels, data) =
-                            employees
-                            |> Array.map (fun employee -> employee.Name, float employee.Age)
-                            |> Array.unzip
-                        let x = 
-                            ChartData(
-                                [|
-                                    BarChartDataSet(
-                                        BackgroundColor = "#d6e8f6",
-                                        Data      = data
-                                    )
-                                |]
-                            )
-                        x.Labels <- labels
-                        let ccc = CommonChartConfig()
-                        let cc = ChartCreate("bar", x, ccc)
-                        Chart(context.Canvas, cc)
-                        |> ignore
-                    }
-                    |> Async.Start
-                )
-            ] []
-        ]
-    
-    let RadarChart =
-        div [] [
-            h3 [] [text "Advanced usage (radar chart)"]
-            canvas [
-                attr.width  "450"
-                attr.height "300"
-                on.afterRender (fun canvas ->
-                    let context = getContext canvas
-                    let x =
-                        ChartData(
-                            [|
-                                RadarChartDataSet(
-                                    BackgroundColor   = "rgba(151, 187, 205, 0.2)",
-                                    BorderColor = "rgba(151, 187, 205, 1)",
-                                    PointBackgroundColor  = Union1Of2 "rgba(151, 187, 205, 1)",
-                                    Data        = [|28.0; 48.0; 40.0; 19.0; 96.0; 27.0; 100.0|]
-                                )
-                                RadarChartDataSet(
-                                    BackgroundColor   = "rgba(220, 220, 220, 0.2)",
-                                    BorderColor = "rgba(220, 220, 220, 1)",
-                                    PointBackgroundColor  = Union1Of2 "rgba(220,220,220,1)",
-                                    Data        = [|65.0; 59.0; 90.0; 81.0; 56.0; 55.0; 40.0|]
-                                )
-                            |]
-                        )
-                    x.Labels <-
-                        [|"Eating"; "Drinking"; "Sleeping"; "Designing"; "Coding"; "Cycling"; "Running"|]
-                    let ccc = CommonChartConfig()
-                    let cc = ChartCreate("radar",x, CommonChartConfig())
-                    Chart(context.Canvas, cc)
-                    |> ignore
-                )
-            ] []
-        ]
+    let private radarChart () =
+        let labels =
+            [| "Eating"; "Drinking"; "Sleeping"; "Designing"; "Coding"; "Cycling"; "Running" |]
+        let data = ChartData()
+        data.Datasets <-
+            [|
+                RadarChartDataSet(
+                    Label = "Alice",
+                    BackgroundColor = "rgba(99, 102, 241, 0.2)",
+                    BorderColor = "rgba(99, 102, 241, 1)",
+                    Data = [| 28.0; 48.0; 40.0; 19.0; 96.0; 27.0; 100.0 |]) :> ADataSet
+                RadarChartDataSet(
+                    Label = "Bob",
+                    BackgroundColor = "rgba(14, 165, 233, 0.2)",
+                    BorderColor = "rgba(14, 165, 233, 1)",
+                    Data = [| 65.0; 59.0; 90.0; 81.0; 56.0; 55.0; 40.0 |]) :> ADataSet
+            |]
+        data.Labels <- labels
+        render data
 
     [<SPAEntryPoint>]
-    let Main =
-        div [] [
-            LineChart
-            BarChart
-            RadarChart
-        ]
-        |> Doc.RunById "main"
+    let Main () =
+        Template()
+            .LineChart(lineChart ())
+            .BarChart(barChart ())
+            .RadarChart(radarChart ())
+            .Bind()

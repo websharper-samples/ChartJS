@@ -1,13 +1,64 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8" />
-        <title>ChartJS</title>
-        <link rel="stylesheet" href="Content/ChartJS.css" />
-        <script src="Content/ChartJS.head.js"></script>
-    </head>
-    <body>
-        <div id="main"></div>
-        <script src="Content/ChartJS.js"></script>
-    </body>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chart.js · WebSharper</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" type="text/css" href="css/index.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "chart.js/auto": "https://cdn.jsdelivr.net/npm/chart.js@4.4.1/auto/+esm"
+      }
+    }
+  </script>
+  <script type="text/javascript" src="Scripts/ChartJS.head.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div class="app-brand">
+        <span class="app-logo"><i class="fa-solid fa-chart-simple"></i></span>
+        <div class="app-titles">
+          <h1>Chart.js</h1>
+          <p>Charts with WebSharper</p>
+        </div>
+      </div>
+      <a class="btn btn-ghost" href="https://github.com/websharper-samples/ChartJS" target="_blank" rel="noreferrer">
+        <i class="fa-brands fa-github"></i><span>Source</span>
+      </a>
+    </header>
+
+    <main class="content">
+      <div class="grid">
+        <section class="card">
+          <div class="card-head">
+            <h2>Expenses</h2>
+            <p>Line chart, in US dollars</p>
+          </div>
+          <div class="chart-body" ws-hole="LineChart"></div>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <h2>Employees</h2>
+            <p>Bar chart of their ages</p>
+          </div>
+          <div class="chart-body" ws-hole="BarChart"></div>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <h2>Skills</h2>
+            <p>Radar chart, two people</p>
+          </div>
+          <div class="chart-body" ws-hole="RadarChart"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="Scripts/ChartJS.min.js"></script>
+</body>
 </html>

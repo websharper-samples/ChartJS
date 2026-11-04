@@ -1,6 +1,11 @@
-src/bin/*
-src/obj/*
-src/wwwroot/Content/*
 *.suo
+*.user
 .vs/
-.vscode/
+*/bin/
+*/obj/
+build/
+src/build/
+src/wwwroot/Scripts/
+src/websharper.log
+node_modules/
+package-lock.json

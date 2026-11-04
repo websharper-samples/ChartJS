@@ -1,0 +1,11 @@
+{
+  "name": "ChartJS",
+  "version": "1.0.0",
+  "private": true,
+  "devDependencies": {
+    "esbuild": "^0.19.9"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.1"
+  }
+}
