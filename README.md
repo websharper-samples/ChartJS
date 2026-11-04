@@ -1,10 +1,13 @@
 # WebSharper Chart.js
 
-A small dashboard of [Chart.js](https://www.chartjs.org/) charts built with the
+A small dashboard of [Chart.js](https://www.chartjs.org/) charts built with
+[WebSharper](https://websharper.com) and the
 [WebSharper.ChartJs](https://github.com/dotnet-websharper/chartjs) bindings: a
 line chart, a bar chart and a radar chart.
 
-![screenshot](docs/screenshot.png)
+[![screenshot](docs/screenshot.png)](https://websharper-samples.github.io/ChartJS)
+
+**[Try it live](https://websharper-samples.github.io/ChartJS)**
 
 ## How it works
 
